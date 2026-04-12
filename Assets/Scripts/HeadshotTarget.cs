@@ -4,6 +4,7 @@ public class HeadshotTarget : MonoBehaviour
 {
     public Target bodyTarget;
     public int headshotMultiplier = 4;
+    public int bonusScore = 20;
 
     public void TakeHeadshot(int damage)
     {
@@ -11,5 +12,9 @@ public class HeadshotTarget : MonoBehaviour
         {
             bodyTarget.TakeDamage(damage * headshotMultiplier);
         }
+
+        // Bonus score
+        if (GameManager.instance != null)
+            GameManager.instance.AddScore(15); // bonus
     }
 }

@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -6,13 +7,11 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 150;
     public int currentHealth;
 
-    [Header("Respawn")]
-    public Transform[] spawnPoints;
-
     [Header("References")]
     public GameObject locomotionObject;
     public GameObject xrSimulator;
-    public GameObject gameOverUI;
+    public GameObject gunObject;
+    public TMP_Text healthText;
 
     CharacterController controller;
     bool isDead = false;
@@ -22,8 +21,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         controller = GetComponent<CharacterController>();
 
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
+        UpdateHealthUI();
     }
 
     public void TakeDamage(int damage)
@@ -32,11 +30,29 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth -= damage;
 
+        UpdateHealthUI();
+
         Debug.Log("Player Health: " + currentHealth);
 
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    // ✅ KEEP ONLY THIS ONE
+    void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            healthText.text = "Health: " + currentHealth;
+
+            if (currentHealth > 80)
+                healthText.color = Color.green;
+            else if (currentHealth > 40)
+                healthText.color = Color.yellow;
+            else
+                healthText.color = Color.red;
         }
     }
 
@@ -50,39 +66,10 @@ public class PlayerHealth : MonoBehaviour
         if (locomotionObject != null)
             locomotionObject.SetActive(false);
 
-        if (xrSimulator != null)
-            xrSimulator.SetActive(false);
+        if (gunObject != null)
+            gunObject.SetActive(false);
 
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
-    }
-
-    public void Respawn()
-    {
-        Debug.Log("Respawning");
-
-        currentHealth = maxHealth;
-        isDead = false;
-
-        if (spawnPoints.Length > 0)
-        {
-            Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
-
-            controller.enabled = false;
-
-            transform.position = spawn.position;
-            transform.rotation = spawn.rotation;
-
-            controller.enabled = true;
-        }
-
-        if (locomotionObject != null)
-            locomotionObject.SetActive(true);
-
-        if (xrSimulator != null)
-            xrSimulator.SetActive(true);
-
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
+        if (GameManager.instance != null)
+            GameManager.instance.GameOver();
     }
 }

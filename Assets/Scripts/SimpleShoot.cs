@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [AddComponentMenu("Nokobot/Modern Guns/Simple Shoot")]
 public class SimpleShoot : MonoBehaviour
@@ -34,12 +35,13 @@ public class SimpleShoot : MonoBehaviour
     public int magazineSize = 7;
     public int currentAmmo = 7;
     public int damage = 40;
+    private bool isReloading = false;
+    [SerializeField] private float reloadTime = 4f;
+    public GameObject reloadUI;
 
     [Header("Fire Settings")]
-    private bool triggerHeld = false;
     private float nextFireTime = 0f;
     private float fireCooldown = 0.25f; // adjust if needed
-    private int lastFireFrame = -1;
 
     [Header("Input")]
     public InputActionProperty fireAction;
@@ -72,16 +74,14 @@ public class SimpleShoot : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.instance != null && GameManager.instance.IsGameOver())
+            return;
+
         // ===== FIRE (INSPECTOR-BASED INPUT) =====
         if (fireAction.action != null && fireAction.action.WasPressedThisFrame())
         {
-            // prevent double fire in same frame
-            if (Time.frameCount == lastFireFrame) return;
-
-            // cooldown check
             if (Time.time < nextFireTime) return;
 
-            lastFireFrame = Time.frameCount;
             nextFireTime = Time.time + fireCooldown;
 
             TryShoot();
@@ -109,6 +109,8 @@ public class SimpleShoot : MonoBehaviour
 
     void TryShoot()
     {
+        if (isReloading) return;
+
         if (currentAmmo <= 0)
         {
             Debug.Log("Out of ammo!");
@@ -196,6 +198,8 @@ public class SimpleShoot : MonoBehaviour
             ).GetComponent<Rigidbody>();
 
             rb.AddForce(barrelLocation.forward * shotPower);
+
+            Destroy(rb.gameObject, 3f);
         }
 
         // casing
@@ -204,10 +208,32 @@ public class SimpleShoot : MonoBehaviour
 
     void Reload()
     {
+        if (isReloading || currentAmmo == magazineSize) return;
+
+        StartCoroutine(ReloadRoutine());
+    }
+
+    IEnumerator ReloadRoutine()
+    {
+        isReloading = true;
+
+        if (reloadUI != null)
+            reloadUI.SetActive(true);
+
         if (reloadSound != null)
             audioSource.PlayOneShot(reloadSound);
 
+        if (gunAnimator != null)
+            gunAnimator.SetTrigger("Reload");
+
+        yield return new WaitForSeconds(reloadTime);
+
         currentAmmo = magazineSize;
+
+        if (reloadUI != null)
+            reloadUI.SetActive(false);
+
+        isReloading = false;
 
         Debug.Log("Reloaded!");
     }

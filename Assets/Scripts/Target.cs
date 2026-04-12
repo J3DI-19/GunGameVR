@@ -11,7 +11,20 @@ public class Target : MonoBehaviour
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
+    }
+
+    void Die()
+    {
+        // Normal kill score
+        if (GameManager.instance != null)
+            GameManager.instance.AddScore(10);
+
+        // Notify wave manager
+        if (WaveManager.instance != null)
+            WaveManager.instance.OnEnemyKilled();
+
+        Destroy(gameObject);
     }
 }
