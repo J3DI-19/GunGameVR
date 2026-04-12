@@ -11,10 +11,11 @@ public class WaveManager : MonoBehaviour
     public Transform[] spawnPoints;
 
     [Header("Wave Settings")]
-    public float spawnDelay = 5f;
+    public float spawnDelay = 1.5f;
 
     private int currentWave = 0;
     private int enemiesAlive = 0;
+    private bool isWaveSpawning = false;
 
     public TMP_Text waveText;
     public GameObject waveClearText;
@@ -31,61 +32,87 @@ public class WaveManager : MonoBehaviour
 
     void StartNextWave()
     {
+        // 🛑 Prevent double triggering
+        if (isWaveSpawning) return;
+
         currentWave++;
+        isWaveSpawning = true;
 
         if (waveText != null)
             waveText.text = "Wave: " + currentWave;
 
         Debug.Log("Starting Wave: " + currentWave);
 
-        StartCoroutine(SpawnWave(currentWave));
+        StartCoroutine(SpawnWave(currentWave)); // 1,2,3...
+    }
+
+    public int GetCurrentWave()
+    {
+        return currentWave;
     }
 
     IEnumerator SpawnWave(int enemyCount)
     {
-        int spawned = 0;
+        enemiesAlive = 0;
 
-        while (spawned < enemyCount)
+        for (int i = 0; i < enemyCount; i++)
         {
-            // Stop if game over
             if (GameManager.instance != null && GameManager.instance.IsGameOver())
                 yield break;
 
-            // Spawn up to max spawn points
-            int batchSize = Mathf.Min(spawnPoints.Length, enemyCount - spawned);
+            SpawnEnemy();
 
-            for (int i = 0; i < batchSize; i++)
-            {
-                SpawnEnemy(spawnPoints[i]);
-                spawned++;
-                enemiesAlive++;
-            }
+            yield return new WaitForSeconds(spawnDelay);
+        }
 
-            // Wait before next batch
-            if (spawned < enemyCount)
-                yield return new WaitForSeconds(spawnDelay);
+        // ✅ Done spawning
+        isWaveSpawning = false;
+
+        // 🛟 Safety: if somehow no enemies registered
+        if (enemiesAlive <= 0)
+        {
+            StartCoroutine(HandleWaveClear());
         }
     }
 
-    void SpawnEnemy(Transform spawnPoint)
+    void SpawnEnemy()
     {
-        Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+        if (spawnPoints.Length == 0 || enemyPrefab == null)
+        {
+            Debug.LogError("SpawnPoints or EnemyPrefab missing!");
+            return;
+        }
+
+        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+        GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+
+        // ✅ REGISTER IMMEDIATELY (NO TIMING ISSUES)
+        enemiesAlive++;
+        Debug.Log("Enemy Spawned. Total: " + enemiesAlive);
     }
 
-    // 🔴 CALLED WHEN ENEMY DIES
+    // 🔴 CALLED BY ENEMY ON DEATH
     public void OnEnemyKilled()
     {
         enemiesAlive--;
 
-        if (enemiesAlive <= 0)
-        {
-            Debug.Log("Wave Cleared!");
+        // 🛟 Clamp (prevents negative bugs)
+        if (enemiesAlive < 0)
+            enemiesAlive = 0;
 
+        Debug.Log("Enemies left: " + enemiesAlive);
+
+        if (enemiesAlive == 0 && !isWaveSpawning)
+        {
             StartCoroutine(HandleWaveClear());
         }
     }
+
     IEnumerator HandleWaveClear()
     {
+        Debug.Log("Wave Cleared!");
+
         if (waveClearText != null)
             waveClearText.SetActive(true);
 
@@ -94,7 +121,8 @@ public class WaveManager : MonoBehaviour
         if (waveClearText != null)
             waveClearText.SetActive(false);
 
+        yield return new WaitForSeconds(1f);
+
         StartNextWave();
     }
-
 }
