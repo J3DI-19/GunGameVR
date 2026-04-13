@@ -66,12 +66,18 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        if (GameManager.instance == null)
+        {
+            Debug.LogError("GameManager is NULL!");
+        }
+
+        if (isDead) return;
+
         isDead = true;
         currentHealth = 0;
 
         Debug.Log("Player Died");
 
-        // 💀 DESTROY ALL ENEMIES
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         foreach (GameObject enemy in enemies)

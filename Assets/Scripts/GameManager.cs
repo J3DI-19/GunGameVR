@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText; // Game Over screen score
     public TMP_Text hudScoreText;
     public GameObject hud;
+    public Transform playerCamera;
+    public float panelDistance = 2f;
 
     private bool isGameOver = false;
     private int score = 0;
@@ -97,8 +99,22 @@ public class GameManager : MonoBehaviour
         }
 
         // 🖥 Show Game Over UI
-        if (gameOverUI != null)
+        if (gameOverUI != null && playerCamera != null)
+        {
+            // Position in front of player
+            Vector3 forward = playerCamera.forward;
+            forward.y = 0; // keep it level
+
+            Vector3 spawnPos = playerCamera.position + forward.normalized * panelDistance;
+
+            gameOverUI.transform.position = spawnPos;
+
+            // Face player
+            gameOverUI.transform.LookAt(playerCamera);
+            gameOverUI.transform.Rotate(0, 180, 0);
+
             gameOverUI.SetActive(true);
+        }
 
         // ❌ Disable HUD
         if (hud != null)

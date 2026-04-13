@@ -1022,6 +1022,8 @@ MonoBehaviour:
   scoreText: {fileID: 1169437139}
   hudScoreText: {fileID: 1296920626}
   hud: {fileID: 2001460356}
+  playerCamera: {fileID: 1865147152}
+  panelDistance: 1.5
 --- !u!4 &183589928
 Transform:
   m_ObjectHideFlags: 0
@@ -1993,17 +1995,17 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 349656986}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.0015, y: 0.0015, z: 0.0015}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1781578585}
-  m_Father: {fileID: 1865147152}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1200, y: 700}
+  m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &349656988
 MonoBehaviour:
@@ -8025,9 +8027,6 @@ PrefabInstance:
       addedObject: {fileID: 2001460357}
     - targetCorrespondingSourceObject: {fileID: 1767192434, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 349656987}
-    - targetCorrespondingSourceObject: {fileID: 1767192434, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 819113513}
     - targetCorrespondingSourceObject: {fileID: 1670256625, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: 0
@@ -9808,7 +9807,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -0.00008606911}
-  m_SizeDelta: {x: 1200, y: 700}
+  m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1781578586
 MonoBehaviour:
@@ -13575,6 +13574,7 @@ SceneRoots:
   - {fileID: 180817241}
   - {fileID: 148556076}
   - {fileID: 1903337117}
+  - {fileID: 349656987}
   - {fileID: 1445991345}
   - {fileID: 954560387}
   - {fileID: 2018519330}
