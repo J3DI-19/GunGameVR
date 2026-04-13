@@ -11218,7 +11218,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 475799661}
         m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: StartNewPlayer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15037,7 +15037,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b9a0880f3ad344ab01a7cb3468b81d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
-  nameInput: {fileID: 369287240}
 --- !u!4 &1626187830
 Transform:
   m_ObjectHideFlags: 0
