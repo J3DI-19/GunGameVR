@@ -33,6 +33,8 @@ public class SelectPlayerUI : MonoBehaviour
             btn.GetComponent<Button>().onClick.AddListener(() =>
             {
                 PlayerManager.instance.SelectPlayer(p);
+
+                FindObjectOfType<LobbyManager>().StartSelectedPlayer();
             });
         }
     }

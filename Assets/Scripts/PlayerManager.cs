@@ -1,27 +1,21 @@
 ﻿using UnityEngine;
-using TMPro;
-using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance;
 
-    [Header("UI")]
-    public TMP_InputField nameInput;
-
     private void Awake()
     {
-        // Singleton
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
     }
 
-    // 🟢 CREATE NEW PLAYER
-    public void CreatePlayer()
+    // 🟢 SAVE / CREATE PLAYER
+    public void SavePlayer(string playerName)
     {
-        string playerName = nameInput.text.Trim();
+        playerName = playerName.Trim();
 
         if (string.IsNullOrEmpty(playerName))
         {
@@ -29,7 +23,7 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        // Save current player
+        // Set current player
         PlayerPrefs.SetString("CurrentPlayer", playerName);
 
         // Add to player list if not exists
@@ -43,10 +37,7 @@ public class PlayerManager : MonoBehaviour
 
         PlayerPrefs.Save();
 
-        Debug.Log("Player Created: " + playerName);
-
-        // Load game
-        SceneManager.LoadScene("GameScene");
+        Debug.Log("Player Saved: " + playerName);
     }
 
     // 🟡 SELECT EXISTING PLAYER
@@ -56,14 +47,18 @@ public class PlayerManager : MonoBehaviour
         PlayerPrefs.Save();
 
         Debug.Log("Selected Player: " + playerName);
+    }
 
-        SceneManager.LoadScene("GameScene");
+    // 🎯 GET CURRENT PLAYER
+    public string GetCurrentPlayer()
+    {
+        return PlayerPrefs.GetString("CurrentPlayer", "Player");
     }
 
     // 🔴 SAVE SCORE
     public void SaveScore(int score)
     {
-        string player = PlayerPrefs.GetString("CurrentPlayer", "");
+        string player = GetCurrentPlayer();
 
         if (string.IsNullOrEmpty(player))
             return;
@@ -94,7 +89,7 @@ public class PlayerManager : MonoBehaviour
         return players.Split(',');
     }
 
-    // 🧹 (OPTIONAL) CLEAR DATA
+    // 🧹 OPTIONAL DEBUG
     public void ClearAllData()
     {
         PlayerPrefs.DeleteAll();

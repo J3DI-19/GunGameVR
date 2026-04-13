@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // 🔥 Safe singleton
         if (instance == null)
             instance = this;
         else
@@ -31,7 +30,12 @@ public class GameManager : MonoBehaviour
 
         score = 0;
         isGameOver = false;
+
+        // Initialize HUD score
+        if (hudScoreText != null)
+            hudScoreText.text = "Score: 0";
     }
+
     public bool IsGameOver()
     {
         return isGameOver;
@@ -40,6 +44,8 @@ public class GameManager : MonoBehaviour
     // 🟢 ADD SCORE
     public void AddScore(int amount)
     {
+        if (isGameOver) return;
+
         score += amount;
 
         if (hudScoreText != null)
@@ -60,25 +66,52 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("GAME OVER");
 
-        // 🛑 Stop waves (centralized)
+        // 🛑 Stop waves
         if (WaveManager.instance != null)
             WaveManager.instance.isGameOver = true;
 
-        // Save score
-        if (PlayerManager.instance != null)
-            PlayerManager.instance.SaveScore(score);
+        // 💾 SAVE SCORE (NO PlayerManager dependency)
+        string player = PlayerPrefs.GetString("CurrentPlayer", "");
 
-        // Show UI
+        int bestScore = 0;
+
+        if (!string.IsNullOrEmpty(player))
+        {
+            string key = player + "_score";
+
+            bestScore = PlayerPrefs.GetInt(key, 0);
+
+            if (score > bestScore)
+            {
+                PlayerPrefs.SetInt(key, score);
+                PlayerPrefs.Save();
+
+                bestScore = score;
+
+                Debug.Log("NEW HIGH SCORE: " + score);
+            }
+            else
+            {
+                Debug.Log("Score not higher than best");
+            }
+        }
+
+        // 🖥 Show Game Over UI
         if (gameOverUI != null)
             gameOverUI.SetActive(true);
 
-        // Disable HUD
+        // ❌ Disable HUD
         if (hud != null)
             hud.SetActive(false);
 
-        // Update score text
+        // 🧾 Update score display
         if (scoreText != null)
-            scoreText.text = "Score: " + score;
+        {
+            if (!string.IsNullOrEmpty(player))
+                scoreText.text = "Score: " + score + "\nBest: " + bestScore;
+            else
+                scoreText.text = "Score: " + score;
+        }
 
         Time.timeScale = 1f;
     }

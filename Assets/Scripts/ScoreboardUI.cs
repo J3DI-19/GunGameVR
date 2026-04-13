@@ -14,7 +14,7 @@ public class ScoreboardUI : MonoBehaviour
 
     void PopulateScores()
     {
-        // Clear old entries
+        // 🧹 Clear old entries
         foreach (Transform child in container)
         {
             Destroy(child.gameObject);
@@ -22,7 +22,7 @@ public class ScoreboardUI : MonoBehaviour
 
         string[] players = PlayerManager.instance.GetAllPlayers();
 
-        // 🔥 SORT PLAYERS BY SCORE (DESCENDING)
+        // 🔥 Sort by score (descending)
         Array.Sort(players, (a, b) =>
         {
             if (string.IsNullOrEmpty(a)) return 1;
@@ -31,10 +31,10 @@ public class ScoreboardUI : MonoBehaviour
             int scoreA = PlayerManager.instance.GetScore(a);
             int scoreB = PlayerManager.instance.GetScore(b);
 
-            return scoreB.CompareTo(scoreA); // DESCENDING
+            return scoreB.CompareTo(scoreA);
         });
 
-        // Create UI entries
+        // 🧾 Create entries
         foreach (string p in players)
         {
             if (string.IsNullOrEmpty(p)) continue;
@@ -43,7 +43,9 @@ public class ScoreboardUI : MonoBehaviour
 
             GameObject entry = Instantiate(entryPrefab, container);
 
-            entry.GetComponent<TMP_Text>().text = p + "  -  " + score;
+            TMP_Text text = entry.GetComponentInChildren<TMP_Text>();
+
+            text.text = $"{p}   -   {score}";
         }
     }
 }
