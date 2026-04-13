@@ -60,6 +60,10 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("GAME OVER");
 
+        // 🛑 Stop waves (centralized)
+        if (WaveManager.instance != null)
+            WaveManager.instance.isGameOver = true;
+
         // Save score
         if (PlayerManager.instance != null)
             PlayerManager.instance.SaveScore(score);
@@ -76,8 +80,7 @@ public class GameManager : MonoBehaviour
         if (scoreText != null)
             scoreText.text = "Score: " + score;
 
-        // Optional: slow time (feels good)
-        Time.timeScale = 1f; // keep normal for VR (don’t freeze)
+        Time.timeScale = 1f;
     }
 
     // 🔁 RESTART

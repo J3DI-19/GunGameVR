@@ -6,6 +6,7 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health")]
     public int maxHealth = 150;
     public int currentHealth;
+    private PlayerDamageFeedback feedback;
 
     [Header("References")]
     public GameObject locomotionObject;
@@ -20,6 +21,7 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         controller = GetComponent<CharacterController>();
+        feedback = GetComponent<PlayerDamageFeedback>();
 
         UpdateHealthUI();
     }
@@ -29,6 +31,12 @@ public class PlayerHealth : MonoBehaviour
         if (isDead) return;
 
         currentHealth -= damage;
+        currentHealth = Mathf.Max(currentHealth, 0); // ✅ Clamp
+
+        if (feedback != null)
+        {
+            feedback.PlayDamageFeedback(); // ✅ Slightly earlier feel
+        }
 
         UpdateHealthUI();
 
@@ -62,6 +70,14 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = 0;
 
         Debug.Log("Player Died");
+
+        // 💀 DESTROY ALL ENEMIES
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject enemy in enemies)
+        {
+            Destroy(enemy);
+        }
 
         if (locomotionObject != null)
             locomotionObject.SetActive(false);

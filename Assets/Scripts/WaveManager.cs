@@ -12,6 +12,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("Wave Settings")]
     public float spawnDelay = 1.5f;
+    public bool isGameOver = false;
 
     private int currentWave = 0;
     private int enemiesAlive = 0;
@@ -32,6 +33,7 @@ public class WaveManager : MonoBehaviour
 
     void StartNextWave()
     {
+        if (isGameOver) return;
         // 🛑 Prevent double triggering
         if (isWaveSpawning) return;
 
@@ -57,8 +59,17 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < enemyCount; i++)
         {
-            if (GameManager.instance != null && GameManager.instance.IsGameOver())
+            if (isGameOver)
+            {
+                isWaveSpawning = false; // ✅ FIX
                 yield break;
+            }
+
+            if (GameManager.instance != null && GameManager.instance.IsGameOver())
+            {
+                isWaveSpawning = false; // ✅ FIX
+                yield break;
+            }
 
             SpawnEnemy();
 
@@ -68,7 +79,7 @@ public class WaveManager : MonoBehaviour
         // ✅ Done spawning
         isWaveSpawning = false;
 
-        // 🛟 Safety: if somehow no enemies registered
+        // 🛟 Safety
         if (enemiesAlive <= 0)
         {
             StartCoroutine(HandleWaveClear());
@@ -111,6 +122,8 @@ public class WaveManager : MonoBehaviour
 
     IEnumerator HandleWaveClear()
     {
+        if (isGameOver) yield break;
+
         Debug.Log("Wave Cleared!");
 
         if (waveClearText != null)
